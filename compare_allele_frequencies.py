@@ -117,10 +117,10 @@ def compute_divergence_scores(all_alleles):
     divergence_scores = {}
     
     for (CHROM, POS), clade_data in all_alleles.items():
-        clade_freqs = list(clade_data.values())  # List of (perc_genotyped, allele_freqs) tuples
+        clade_freqs = list(clade_data.values())
         
         if len(clade_freqs) < 2:
-            continue  # Skip loci present in only one clade
+            continue
         
         all_alleles_set = set()
         for _, allele_freqs in clade_freqs:
