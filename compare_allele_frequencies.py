@@ -115,33 +115,38 @@ def find_private_sites(all_alleles):
 
 def compute_divergence_scores(all_alleles):
     divergence_scores = {}
-    
+
     for (CHROM, POS), clade_data in all_alleles.items():
         clade_freqs = list(clade_data.values())
-        
+
         if len(clade_freqs) < 2:
             continue
-        
+
         all_alleles_set = set()
-        for _, allele_freqs in clade_freqs:
+        total_genotyped = 0
+        num_clades = len(clade_freqs)
+
+        for perc_genotyped, allele_freqs in clade_freqs:
             all_alleles_set.update(allele_freqs.keys())
-        
+            total_genotyped += perc_genotyped
+
         max_diff = 0
         for allele in all_alleles_set:
             freqs = [clade[1].get(allele, 0.0) for clade in clade_freqs]
             max_diff += max(freqs) - min(freqs)
-        
-        divergence_scores[(CHROM, POS)] = max_diff
-    
+
+        avg_genotyped = total_genotyped / num_clades
+        divergence_scores[(CHROM, POS)] = (max_diff, avg_genotyped)
+
     return divergence_scores
 
 def write_most_divergent_loci(divergence_scores, filename, top_n=200):
-    sorted_loci = sorted(divergence_scores.items(), key=lambda x: x[1], reverse=True)[:top_n]
-    
+    sorted_loci = sorted(divergence_scores.items(), key=lambda x: x[1][0], reverse=True)[:top_n]
+
     with open(filename, 'w') as file:
-        file.write("Chrom\tPos\tDivergence_Score\n")
-        for (CHROM, POS), score in sorted_loci:
-            file.write(f"{CHROM}\t{POS}\t{score:.4f}\n")
+        file.write("Chrom\tPos\tDivergence_Score\tAvg_Perc_Genotyped\n")
+        for (CHROM, POS), (score, avg_genotyped) in sorted_loci:
+            file.write(f"{CHROM}\t{POS}\t{score:.4f}\t{avg_genotyped:.2f}\n")
 
 def write_fixed_alleles_to_file(fixed_alleles, filename):
     header = "Chrom Pos Clade Allele Freq"
