@@ -141,8 +141,9 @@ def compute_divergence_scores(all_alleles):
     return divergence_scores
 
 def write_most_divergent_loci(divergence_scores, filename, num_div_loci=200):
-    sorted_loci = sorted(divergence_scores.items(), key=lambda x: x[1][0], reverse=True)[:num_div_loci]
-
+    filtered_scores = {k: v for k, v in divergence_scores.items() if not math.isnan(float(v[0]))}
+    sorted_loci = sorted(filtered_scores.items(), key=lambda x: round(float(x[1][0]), 6), reverse=True)[:num_div_loci]
+   
     with open(filename, 'w') as file:
         file.write("Chrom\tPos\tDivergence_Score\tAvg_Perc_Genotyped\n")
         for (CHROM, POS), (score, avg_genotyped) in sorted_loci:
