@@ -23,7 +23,7 @@ def calculate_missingness(geno_file, names):
     for i in range(len(total)):
         name = names[i] if i < len(names) else f"Individual_{i+1}"
         miss_pct = 100 * missing[i] / total[i]
-        print(f"{name}: Missing = {miss_pct:.2f}% ({missing[i]}/{total[i]})")
+        print(f"{name}\t{miss_pct:.2f}\t({missing[i]}/{total[i]})")
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
